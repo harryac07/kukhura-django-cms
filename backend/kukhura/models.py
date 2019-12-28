@@ -2,17 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime
 
-# connect(DB_NAME)
-
-# from kukhura.serializers import ServiceSerializer
-
-
-class User(models.Model):
-    firstname = models.TextField()
-    lastname = models.TextField()
-    email = models.TextField(null=False, unique=True)
-    created = models.DateTimeField(default=datetime.datetime.utcnow)
-
 
 class Service(models.Model):
     title = models.TextField(null=False, unique=True)

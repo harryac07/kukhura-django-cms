@@ -5,8 +5,7 @@ from .models import Service, Product, Comment, BlogPost
 
 
 class UserSerializer(serializers.ModelSerializer):
-    blogposts = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=BlogPost.objects.all())
+    # blogposts = BlogPostSerializer(many=True, required=False)
 
     class Meta:
         model = User
