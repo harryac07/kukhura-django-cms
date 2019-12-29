@@ -5,11 +5,9 @@ from .models import Service, Product, Comment, BlogPost
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # blogposts = BlogPostSerializer(many=True, required=False)
-
     class Meta:
         model = User
-        fields = ['username', 'email', 'groups', 'blogposts']
+        fields = ['username', 'email', 'groups']
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -35,6 +33,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class BlogPostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     comments = CommentSerializer(many=True, required=False)
+
     class Meta:
         model = BlogPost
         fields = ['id', 'title', 'description', 'post_primary_image',

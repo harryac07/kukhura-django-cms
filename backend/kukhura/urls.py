@@ -13,5 +13,5 @@ router.register(r'users', views.UserViewSet, basename='users')
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    path('authenticate/', views.CustomObtainAuthToken.as_view()),
 ]
