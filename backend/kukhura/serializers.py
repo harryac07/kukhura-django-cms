@@ -35,7 +35,6 @@ class CommentSerializer(serializers.ModelSerializer):
 class BlogPostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     comments = CommentSerializer(many=True, required=False)
-
     class Meta:
         model = BlogPost
         fields = ['id', 'title', 'description', 'post_primary_image',

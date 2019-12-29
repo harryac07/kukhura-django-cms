@@ -30,7 +30,8 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         # s1 = json.dumps(self.request.data)
         # d2 = json.loads(s1)
         # print(d2)
-        serializer.save(author=user)
+        serializer.save(author=self.request.user)
+    
 
 
 class UserViewSet(viewsets.ModelViewSet):
