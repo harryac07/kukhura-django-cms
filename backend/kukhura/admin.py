@@ -9,9 +9,10 @@ class ServiceAdmin(admin.ModelAdmin):
 
 
 class BlogPostAdmin(admin.ModelAdmin):
-    fields = ('title', 'description', 'post_primary_image', 'author', 'created', 'comments')
-    list_display = ('title', 'description', 'post_primary_image', 'author', 'created')
-
+    fields = ('title', 'description', 'post_primary_image',
+              'author', 'created', 'hero_post')
+    list_display = ('title', 'description', 'post_primary_image',
+                    'author', 'hero_post', 'created')
 
 
 admin.site.register(Service, ServiceAdmin)

@@ -37,17 +37,22 @@ class BlogPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = ['id', 'title', 'description', 'post_primary_image',
-                  'author', 'created', 'updated', 'comments']
+                  'author', 'hero_post', 'created', 'updated', 'comments']
 
     def create(self, validated_data):
         if 'comments' not in validated_data:
             validated_data['comments'] = []
         else:
             pass
+        # remove comments property from validated_data
         comment_validated_data = validated_data.pop('comments')
+
+        # add blogpost without comments object
         blogpost = BlogPost.objects.create(**validated_data)
-        comment_serializer = self.fields['comments']
+
+        # add blogpost value to each comment
+        # create all available comments
         for each in comment_validated_data:
             each['blogpost'] = blogpost
-        comments = comment_serializer.create(comment_validated_data)
+            Comment.objects.create(**each)
         return blogpost

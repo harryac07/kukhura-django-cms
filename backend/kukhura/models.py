@@ -41,10 +41,12 @@ class BlogPost(models.Model):
     title = models.TextField(null=False, unique=True)
     description = models.TextField()
     post_primary_image = models.TextField()
+    hero_post = models.BooleanField(default=False)
     author = models.ForeignKey(
         User, related_name='user', on_delete=models.CASCADE, null=True)
     created = models.DateTimeField(default=datetime.datetime.utcnow)
     updated = models.DateTimeField(null=True)
+
     class Meta:
         ordering = ['created']
 
