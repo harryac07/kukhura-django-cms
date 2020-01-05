@@ -19,14 +19,14 @@ import cloudinary.api
 
 from django.contrib.auth.models import User
 
-from .models import Service, Product, Comment, BlogPost
+from .models import Product, Comment, Post, Category
 
-from .serializers import UserSerializer, ServiceSerializer, ProductSerializer, BlogPostSerializer, CommentSerializer
+from .serializers import UserSerializer, ProductSerializer, BlogPostSerializer, CommentSerializer, CategorySerializer
 
 
-class ServiceList(viewsets.ModelViewSet):
-    queryset = Service.objects.all()
-    serializer_class = ServiceSerializer
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
@@ -37,9 +37,18 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class BlogPostViewSet(viewsets.ModelViewSet):
-    queryset = BlogPost.objects.all()
+    queryset = Post.objects.all()
     serializer_class = BlogPostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        category = self.request.query_params.get('category', None)
+        if category is not None:
+            queryset = queryset.filter(
+                category=Category.objects.get(name=category)
+            )
+        return queryset
 
     def perform_create(self, serializer):
         # s1 = json.dumps(self.request.data)

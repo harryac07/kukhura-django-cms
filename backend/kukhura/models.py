@@ -1,49 +1,42 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 import datetime
 
 
-class Service(models.Model):
-    title = models.TextField(null=False, unique=True)
-    description = models.TextField(help_text='service description')
-    service_primary_image = models.TextField(
-        help_text='main image to show in layout UI')
-    service_secondary_images = models.TextField(
-        help_text='optional images to show if needed')
-    hero_service = models.BooleanField(
-        default=False, help_text='is it to be placed on top of the service page? default to false')
+class Category(models.Model):  # blogpost, service, product
+    name = models.TextField(blank=False)
     created = models.DateTimeField(default=datetime.datetime.utcnow)
 
-    class Meta:
-        ordering = ['title']
-
     def __str__(self):
-        return self.title
+        return self.name
 
 
-class Product(models.Model):
+class Post(models.Model):
     title = models.TextField(null=False, unique=True)
     description = models.TextField()
-    product_primary_image = models.TextField()
-    product_secondary_images = models.TextField()
-    hero_product = models.BooleanField(default=False)
-    available = models.BooleanField(default=True)
-    created = models.DateTimeField(default=datetime.datetime.utcnow)
-
-    class Meta:
-        ordering = ['title']
-
-    def __str__(self):
-        return self.title
-
-
-class BlogPost(models.Model):
-    title = models.TextField(null=False, unique=True)
-    description = models.TextField()
-    post_primary_image = models.TextField()
-    hero_post = models.BooleanField(default=False)
+    primary_image = models.TextField()
+    secondary_images = ArrayField(
+        models.TextField(
+            help_text='optional images to show if needed'),
+        null=True
+    )
+    hero_post = models.BooleanField(
+        default=False,
+        help_text='Is it to be placed on top of the service page? default to false'
+    )
     author = models.ForeignKey(
-        User, related_name='user', on_delete=models.CASCADE, null=True)
+        User,
+        related_name='user',
+        on_delete=models.CASCADE,
+        null=True
+    )
+    category = models.ForeignKey(
+        Category,
+        related_name='category',
+        on_delete=models.CASCADE,
+        null=True
+    )
     created = models.DateTimeField(default=datetime.datetime.utcnow)
     updated = models.DateTimeField(null=True)
 
@@ -54,9 +47,16 @@ class BlogPost(models.Model):
         return self.title
 
 
+class Product(Post):
+    available = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['title']
+
+
 class Comment(models.Model):
     email = models.TextField(blank=False)
     comment = models.TextField()
     blogpost = models.ForeignKey(
-        BlogPost, on_delete=models.CASCADE, related_name='comments')
+        Post, on_delete=models.CASCADE, related_name='comments')
     created = models.DateTimeField(default=datetime.datetime.utcnow)

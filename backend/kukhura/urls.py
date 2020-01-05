@@ -5,7 +5,7 @@ from kukhura import views
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
-router.register(r'services', views.ServiceList, basename='services')
+router.register(r'categories', views.CategoryViewSet, basename='categories')
 router.register(r'products', views.ProductViewSet, basename='products')
 router.register(r'blogposts', views.BlogPostViewSet, basename='blogposts')
 router.register(r'users', views.UserViewSet, basename='users')
