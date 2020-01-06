@@ -30,6 +30,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -70,9 +76,8 @@ class CustomObtainAuthToken(ObtainAuthToken):
             context={'request': request}
         )
         serializer.is_valid(raise_exception=True)
-
         user = serializer.validated_data['user']
-        token = Token.objects.get(user=user)
+        token, created = Token.objects.get_or_create(user=user)
         group = user.groups.values_list('name', flat=True)
 
         return Response({

@@ -60,3 +60,4 @@ class Comment(models.Model):
     blogpost = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name='comments')
     created = models.DateTimeField(default=datetime.datetime.utcnow)
+
