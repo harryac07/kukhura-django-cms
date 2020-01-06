@@ -40,6 +40,14 @@ class BlogPostSerializer(serializers.ModelSerializer):
             validated_data['comments'] = []
         else:
             pass
+
+        # if post is set to hero, remove other and set this to hero_post
+        if validated_data['hero_post'] == True:
+            category = validated_data['category']
+            Post.objects.filter(
+                hero_post=True, category=category).update(hero_post=False)
+        else:
+            print('hero_post False')
         # remove comments property from validated_data
         comment_validated_data = validated_data.pop('comments')
         # add blogpost without comments object
