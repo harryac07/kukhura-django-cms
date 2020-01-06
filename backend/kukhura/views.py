@@ -1,10 +1,12 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.decorators import action
 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import Group
 from rest_framework.response import Response
+from rest_framework import status
 
 import json
 import cloudinary
@@ -69,7 +71,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class CustomObtainAuthToken(ObtainAuthToken):
+class GenerateLoginToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(
             data=request.data,
@@ -82,8 +84,24 @@ class CustomObtainAuthToken(ObtainAuthToken):
 
         return Response({
             'token': token.key,
+            'token_created': token.created,
             'user_id': user.pk,
             'email': user.email,
             'username': user.username,
             'group': group
         })
+
+
+class LogoutView(ObtainAuthToken):
+    def get(self, request, *args, **kwargs):
+        """
+            Get token if token exists
+            Delete token to logout user
+        """
+        if request.user.is_anonymous:
+            pass
+        else:
+            token = Token.objects.get(user=request.user)
+            if token:
+                request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK, data='Logged out successfully!')
