@@ -105,3 +105,17 @@ class LogoutView(ObtainAuthToken):
             if token:
                 request.user.auth_token.delete()
         return Response(status=status.HTTP_200_OK, data='Logged out successfully!')
+
+
+class checkAuthentication(ObtainAuthToken):
+    def get(self, request, *args, **kwargs):
+        """
+            Get token if token exists
+            Validate and return token
+        """
+        req_token = request.GET.get('token', '')
+        if req_token:
+            token = Token.objects.get(key=req_token)
+            if token.key == req_token:
+                return Response(status=status.HTTP_200_OK, data='Logged in!')
+        return Response(status=status.HTTP_200_OK, data='Not logged in!')

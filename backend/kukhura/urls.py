@@ -16,4 +16,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/login/', views.GenerateLoginToken.as_view()),
     path('auth/logout/', views.LogoutView.as_view()),
+    path('auth/isauthenticated/', views.checkAuthentication.as_view()),
 ]
