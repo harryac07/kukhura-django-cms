@@ -30,25 +30,20 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-
 class BlogPostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(category=Category.objects.get(name='blog'))
     serializer_class = BlogPostSerializer
     # permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):
-        queryset = Post.objects.all()
-        category = self.request.query_params.get('category', None)
-        if category is not None:
-            queryset = queryset.filter(
-                category=Category.objects.get(name=category)
-            )
-        return queryset
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     # filter based on query string: category
+    #     category = self.request.query_params.get('category', None)
+    #     if category is not None:
+    #         queryset = queryset.filter(
+    #             category=Category.objects.get(name=category)
+    #         )
+    #     return queryset
 
     def perform_create(self, serializer):
         if self.request.FILES['image_file']:
@@ -62,8 +57,14 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         # print(d2)
         serializer.save(
             author=self.request.user,
-            primary_image = upload_data.get('url')
+            primary_image = upload_data.get('url'),
+            secondary_images = [upload_data.get('url')]
         )
+
+class ProductViewSet(BlogPostViewSet):
+    queryset = Post.objects.filter(category=Category.objects.get(name='product'))
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class UserViewSet(viewsets.ModelViewSet):
