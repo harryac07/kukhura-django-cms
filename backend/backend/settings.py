@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 import psycopg2
 import environ
+import cloudinary
 
 # set default values
 env = environ.Env(
@@ -28,6 +29,12 @@ DEBUG = env('DEBUG')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Cloudinary configuration for image upload and processing
+cloudinary.config(
+  cloud_name = env('CLOUDINARY_NAME'),
+  api_key = env('CLOUDINARY_API_KEY'),
+  api_secret = env('CLOUDINARY_API_SECRET')
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/

@@ -9,15 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 import json
-import cloudinary
 import cloudinary.uploader
-import cloudinary.api
-
-# cloudinary.config(
-#   cloud_name = "sample",
-#   api_key = "874837483274837",
-#   api_secret = "a676b67565c6767a6767d6767f676fe1"
-# )
 
 from django.contrib.auth.models import User
 
@@ -47,7 +39,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 class BlogPostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = BlogPostSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         queryset = Post.objects.all()
@@ -59,10 +51,19 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        if self.request.FILES['image_file']:
+            upload_data = cloudinary.uploader.upload(
+                self.request.FILES['image_file'],
+                use_filename = True,
+                folder = "kukhura"
+            )
         # s1 = json.dumps(self.request.data)
         # d2 = json.loads(s1)
         # print(d2)
-        serializer.save(author=self.request.user)
+        serializer.save(
+            author=self.request.user,
+            primary_image = upload_data.get('url')
+        )
 
 
 class UserViewSet(viewsets.ModelViewSet):
