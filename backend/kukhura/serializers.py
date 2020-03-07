@@ -4,7 +4,7 @@ import datetime
 from django.utils import timezone
 from django.contrib.auth.models import User, Group
 
-from .models import Product, Comment, Post, Category
+from .models import Product, Comment, CommentReply, Post, Category
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,10 +19,18 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'created']
 
 
+class CommentReplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentReply
+        fields = ['email', 'reply', 'created', 'id', 'comment']
+
+
 class CommentSerializer(serializers.ModelSerializer):
+    reply = CommentReplySerializer(many=True, required=False)
+
     class Meta:
         model = Comment
-        fields = ['email', 'comment', 'created', 'blogpost', 'id']
+        fields = ['email', 'comment', 'created', 'blogpost', 'id', 'reply']
 
 
 class BlogPostSerializer(serializers.ModelSerializer):
@@ -47,7 +55,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
             category = validated_data['category']
             Post.objects.filter(
                 hero_post=True, category=category).update(hero_post=False)
-        
+
         # remove comments property from validated_data
         comment_validated_data = validated_data.pop('comments')
 
@@ -98,7 +106,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
             print(dict(each)['email'])
             print(dict(each))
             # Comment.objects.filter(
-                # id=True, category=category).update(hero_post=False)
+            # id=True, category=category).update(hero_post=False)
         return instance
 
 

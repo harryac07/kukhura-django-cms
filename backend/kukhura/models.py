@@ -58,6 +58,17 @@ class Comment(models.Model):
     email = models.TextField(blank=False)
     comment = models.TextField()
     blogpost = models.ForeignKey(
-        Post, on_delete=models.CASCADE, related_name='comments')
+        Post, on_delete=models.CASCADE, related_name='comments')    
     created = models.DateTimeField(default=datetime.datetime.utcnow)
 
+class CommentReply(models.Model):
+    email = models.TextField(blank=False)
+    reply = models.TextField()
+    comment = models.ForeignKey(
+        Comment,
+        related_name='reply',
+        on_delete=models.CASCADE,
+        null=False,
+        blank= False
+    )
+    created = models.DateTimeField(default=datetime.datetime.utcnow)

@@ -13,9 +13,9 @@ import cloudinary.uploader
 
 from django.contrib.auth.models import User
 
-from .models import Product, Comment, Post, Category
+from .models import Product, Comment, CommentReply, Post, Category
 
-from .serializers import UserSerializer, ProductSerializer, BlogPostSerializer, CommentSerializer, CategorySerializer
+from .serializers import UserSerializer, ProductSerializer, BlogPostSerializer, CommentSerializer, CommentReplySerializer,  CategorySerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -28,6 +28,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     # permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class CommentReplyViewSet(viewsets.ModelViewSet):
+    queryset = CommentReply.objects.all()
+    serializer_class = CommentReplySerializer
 
 
 class BlogPostViewSet(viewsets.ModelViewSet):
@@ -49,20 +54,22 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         if self.request.FILES['image_file']:
             upload_data = cloudinary.uploader.upload(
                 self.request.FILES['image_file'],
-                use_filename = True,
-                folder = "kukhura"
+                use_filename=True,
+                folder="kukhura"
             )
         # s1 = json.dumps(self.request.data)
         # d2 = json.loads(s1)
         # print(d2)
         serializer.save(
             author=self.request.user,
-            primary_image = upload_data.get('url'),
-            secondary_images = [upload_data.get('url')]
+            primary_image=upload_data.get('url'),
+            secondary_images=[upload_data.get('url')]
         )
 
+
 class ProductViewSet(BlogPostViewSet):
-    queryset = Post.objects.filter(category=Category.objects.get(name='product'))
+    queryset = Post.objects.filter(
+        category=Category.objects.get(name='product'))
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
