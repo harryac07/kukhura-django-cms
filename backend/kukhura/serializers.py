@@ -42,7 +42,6 @@ class BlogPostSerializer(serializers.ModelSerializer):
             validated_data['comments'] = []
         else:
             pass
-
         # if post is set to hero, remove other and set this to hero_post
         if validated_data['hero_post'] == True:
             category = validated_data['category']
@@ -106,10 +105,11 @@ class BlogPostSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     post_category = CategorySerializer(source='category', read_only=True)
+    comments = CommentSerializer(many=True, required=False)
     category = serializers.ChoiceField(
         choices=Category.objects.all(), write_only=True)
 
     class Meta:
         model = Product
         fields = ['id', 'title', 'description', 'primary_image', 'author', 'category', 'post_category',
-                  'secondary_images', 'hero_post', 'available', 'created']
+                  'secondary_images', 'hero_post', 'available', 'comments', 'created']
