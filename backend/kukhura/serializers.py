@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User, Group
 
 from .models import Product, Comment, CommentReply, Post, Category
-
+from .helpers.blog_post import unset_existing_hero_post_if_user_want_to_set_new
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,13 +48,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         if 'comments' not in validated_data:
             validated_data['comments'] = []
-        else:
-            pass
-        # if post is set to hero, remove other and set this to hero_post
-        if validated_data['hero_post'] == True:
-            category = validated_data['category']
-            Post.objects.filter(
-                hero_post=True, category=category).update(hero_post=False)
+        unset_existing_hero_post_if_user_want_to_set_new(validated_data, Post)
 
         # remove comments property from validated_data
         comment_validated_data = validated_data.pop('comments')
@@ -72,42 +66,10 @@ class BlogPostSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if 'comments' not in validated_data:
             validated_data['comments'] = []
-        else:
-            pass
-
-        # if post is set to hero, remove other and set this to hero_post
-        category = validated_data['category']
-        if validated_data['hero_post'] == True:
-            Post.objects.filter(
-                hero_post=True, category=category).update(hero_post=False)
-        else:
-            print('hero_post False')
-
+        unset_existing_hero_post_if_user_want_to_set_new(validated_data, Post)
         # remove comments property from validated_data
-        comment_validated_data = validated_data.pop('comments')
-
-        # update blogpost
-        instance.title = validated_data.get('title', instance.title)
-        instance.description = validated_data.get(
-            'description', instance.description)
-        instance.primary_image = validated_data.get(
-            'primary_image', instance.primary_image)
-        instance.secondary_images = validated_data.get(
-            'secondary_images', instance.secondary_images)
-        instance.hero_post = validated_data.get(
-            'hero_post', instance.hero_post)
-        instance.category = validated_data.get('category', instance.category)
-        instance.updated = datetime.datetime.now(tz=timezone.utc)
-        instance.save()
-
-        # add blogpost value to each comment
-        # create all available comments
-        for each in comment_validated_data:
-            print(dict(each)['email'])
-            print(dict(each))
-            # Comment.objects.filter(
-            # id=True, category=category).update(hero_post=False)
-        return instance
+        validated_data.pop('comments')
+        return super(BlogPostSerializer, self).update(instance, validated_data)
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -121,3 +83,12 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'title', 'description', 'primary_image', 'author', 'category', 'post_category',
                   'secondary_images', 'hero_post', 'available', 'comments', 'created']
+
+    def create(self, validated_data):
+        unset_existing_hero_post_if_user_want_to_set_new(validated_data, Product)
+        blogpost = Product.objects.create(**validated_data)
+        return blogpost
+
+    def update(self, instance, validated_data):
+        unset_existing_hero_post_if_user_want_to_set_new(validated_data, Product)
+        return super(ProductSerializer, self).update(instance, validated_data)
